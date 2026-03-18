@@ -1,0 +1,109 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+@import "tailwindcss";
+
+
+/* ======================
+   DESIGN TOKENS
+====================== */
+@theme inline {
+--color-primary: #111111D9;
+--color-text-primary: #333333;
+--color-text-secondary: #666666D9;
+--color-text-blue: #2196f3;
+--color-text-placeholder: #999999;
+
+
+--color-background: #ffffff;
+--color-background-soft: #f5f5f5;
+
+--color-border: #dae1e7;
+--color-border-strong: #d4d4d4;
+
+  /* ===== Status ===== */
+  --color-error: #ff0000;
+  --color-success: #4bae4f;
+  --color-warning: #ffcc00;
+  --color-info: #006af5;
+
+  /* ===== Fonts ===== */
+  --font-sans: "Roboto", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ======================
+   BASE
+====================== */
+@layer base {
+  body {
+    @apply bg-white font-sans text-black;
+  }
+
+  /* text */
+  .h1 {
+    @apply text-[64px] leading-[72px] font-bold;
+  }
+
+  .h2 {
+    @apply text-[48px] leading-[56px] font-semibold;
+  }
+
+  .h3 {
+    @apply text-[32px] leading-[40px] font-semibold;
+  }
+
+  .h4 {
+    @apply text-[24px] leading-[32px] font-semibold;
+  }
+
+  .h5 {
+    @apply text-[20px] leading-[28px] font-semibold;
+  }
+  .container {
+    @apply max-w-7xl mx-auto;
+  }
+}
+
+/* tuyết trong banner */
+
+@keyframes snowUp {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-600px);
+    opacity: 0;
+  }
+}
+
+.snowflake {
+  position: absolute;
+  bottom: -10px;
+  animation-name: snowUp;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  pointer-events: none;
+}
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* nền */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1; /* thanh kéo */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: block;
+  opacity: 1;
+}
