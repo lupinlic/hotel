@@ -1,7 +1,5 @@
 "use client";
 import { useBookingStore } from "@/store/booking";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return null;
@@ -23,10 +21,6 @@ const formatDate = (dateStr: string) => {
 const BookingSummary = () => {
   const { room, checkIn, checkOut, adults, children, paymentMethod } =
     useBookingStore();
-  const router = useRouter();
-
-  const isValid =
-    room && checkIn && checkOut && new Date(checkOut) > new Date(checkIn);
 
   if (!room) {
     return (

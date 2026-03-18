@@ -18,6 +18,11 @@ export default function Payment() {
         (1000 * 60 * 60 * 24)
       : 1;
 
+  if (!room) {
+    router.push("/room");
+    return null;
+  }
+
   const subtotal = nights * room.price;
   const discount = subtotal * 0.1;
   const total = subtotal - discount;
@@ -101,7 +106,9 @@ export default function Payment() {
           onClick={handlePaid}
           disabled={loading}
           className={`w-full py-3 rounded-lg text-white cursor-pointer ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600"
           }`}
         >
           {loading ? "Đang xử lý..." : "Tôi đã chuyển khoản"}
