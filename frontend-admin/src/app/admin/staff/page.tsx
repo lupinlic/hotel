@@ -1,0 +1,1 @@
+export default function StaffPage() { return <div className="text-lg font-semibold">Quản lý nhân viên</div>; }
