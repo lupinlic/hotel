@@ -1,5 +1,6 @@
 "use client";
-import { useState, useRef } from "react";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import DateField from "@/components/shared/components/DateField";
 import RoomCard from "./components/RoomCard";
 import { useRoomTypes } from "@/hooks/useRoomTypes";
@@ -14,7 +15,28 @@ export default function RoomView() {
   const [adults, setAdults] = useState<number>(1);
   const [children, setChildren] = useState<number>(0);
 
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search")?.trim() ?? "";
+
   const { data: roomTypes, isLoading, isError } = useRoomTypes();
+
+  const filteredRoomTypes = useMemo(() => {
+    if (!roomTypes) {
+      return undefined;
+    }
+    if (!searchQuery) {
+      return roomTypes;
+    }
+
+    return roomTypes.filter((roomType) => {
+      const lowerQuery = searchQuery.toLowerCase();
+      const nameMatches = roomType.name.toLowerCase().includes(lowerQuery);
+      const descriptionMatches = roomType.description
+        ? roomType.description.toLowerCase().includes(lowerQuery)
+        : false;
+      return nameMatches || descriptionMatches;
+    });
+  }, [roomTypes, searchQuery]);
 
   return (
     <div className="flex flex-col gap-10">
@@ -119,12 +141,16 @@ export default function RoomView() {
           <p className="text-center text-red-500">Không tải được danh sách phòng.</p>
         )}
 
-        {!isLoading && !isError && (roomTypes?.length ?? 0) === 0 && (
-          <p className="text-center text-gray-500">Chưa có phòng nào.</p>
+        {!isLoading && !isError && (filteredRoomTypes?.length ?? 0) === 0 && (
+          <p className="text-center text-gray-500">
+            {searchQuery
+              ? `Không tìm thấy phòng phù hợp với "${searchQuery}".`
+              : "Chưa có phòng nào."}
+          </p>
         )}
 
-        {!isLoading && !isError && (roomTypes?.length ?? 0) > 0 && (
-          roomTypes?.map((roomType) => {
+        {!isLoading && !isError && (filteredRoomTypes?.length ?? 0) > 0 && (
+          filteredRoomTypes?.map((roomType) => {
             const room = {
               id: roomType.id,
               name: roomType.name,

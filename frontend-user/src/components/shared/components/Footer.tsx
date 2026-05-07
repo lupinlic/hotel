@@ -12,7 +12,7 @@ export default function Footer() {
           {/* ABOUT */}
           <div>
             <h3 className="text-white text-xl font-semibold mb-4">
-              Khách sạn Đà Lạt
+              Khách sạn Marriott
             </h3>
             <p className="text-sm leading-relaxed">
               Chúng tôi mang đến trải nghiệm nghỉ dưỡng tuyệt vời với

@@ -11,7 +11,7 @@ function Introduce() {
         />
         <div className="flex flex-col items-center justify-center gap-6 text-text-primary">
           <h4 className="text-3xl font-bold text-center">
-            GIỚI THIỆU KHÁCH SẠN HILLTER
+            GIỚI THIỆU KHÁCH SẠN MARRIOTT
           </h4>
           <p className="text-[18px] text-center font-medium">
             Chúng tôi gọi nơi này là nhà, nơi tình bạn bắt đầu dù bạn đến từ đâu
@@ -32,7 +32,7 @@ function Introduce() {
         <div className="flex flex-col gap-6 text-text-primary">
           <h4 className="text-3xl font-bold text-center">Dịch vụ & tiện ích</h4>
           <p className="text-16px text-center">
-            Một trong những khách sạn được yêu thích nhất ở Đà Lạt, Hotel Hilter
+            Một trong những khách sạn được yêu thích nhất ở Đà Lạt, Hotel Marriott
             được công nhận là một trong những khách sạn hàng đầu của Việt Nam,
             với lòng hiếu khách của hòn đảo duyên dáng, tiện nghi chu đáo và đặc
             sắc.
