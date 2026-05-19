@@ -83,10 +83,12 @@ export function DashboardClient() {
         <BookingMetrics metrics={data.metrics} />
         <MonthlyOccupancyChart
           occupancyRate={data.occupancy.occupancy_rate}
-          monthlyData={data.revenueReport.data.map((item: any) => ({
-            label: item.label,
-            occupancy_rate: Math.round(Math.random() * 30 + 60),
-          }))}
+          monthlyData={[
+            {
+              label: "Hiện tại",
+              occupancy_rate: data.occupancy.occupancy_rate,
+            },
+          ]}
         />
       </div>
       <div className="md:col-span-5">

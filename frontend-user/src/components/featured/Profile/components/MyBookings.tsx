@@ -86,7 +86,22 @@ export default function MyBookings() {
         </div>
       ) : (
         <div className="space-y-6">
-          {bookings.map((booking) => (
+          {bookings
+            .slice()
+            .sort((a, b) => {
+              // Incomplete statuses first
+              const incompleteStatuses = ["pending", "confirmed", "checked_in", "checked_out"];
+              const aIsIncomplete = incompleteStatuses.includes(a.status);
+              const bIsIncomplete = incompleteStatuses.includes(b.status);
+
+              if (aIsIncomplete !== bIsIncomplete) {
+                return aIsIncomplete ? -1 : 1;
+              }
+
+              // Then by creation date (newest first)
+              return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            })
+            .map((booking) => (
             <div
               key={booking.id}
               className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition"

@@ -42,6 +42,7 @@ Route::get('/reviews', [ReviewController::class, 'index']);
 
 // 👉 QUAN TRỌNG: guest vẫn đặt được
 Route::post('/bookings', [BookingController::class, 'store']);
+Route::post('/payments', [PaymentController::class, 'store']);
 
 /*
 |--------------------------------------------------------------------------
@@ -61,31 +62,11 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
 
     // 💳 payment
-    Route::post('/payments', [PaymentController::class, 'store']);
     Route::get('/payments/{id}', [PaymentController::class, 'show']);
 
     // 🧾 user own reviews
     Route::get('/my-reviews', [ReviewController::class, 'myReviews']);
 });
-Route::middleware('auth:api')->group(function () {
-
-    // 👤 Auth
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-    // 📦 booking của user
-    Route::get('/my-bookings', [BookingController::class, 'myBookings']);
-    Route::get('/bookings/{id}', [BookingController::class, 'show']);
-    Route::put('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
-
-    // 💳 payment
-    Route::post('/payments', [PaymentController::class, 'store']);
-    Route::get('/payments/{id}', [PaymentController::class, 'show']);
-
-    // 🧾 user own reviews
-    Route::get('/my-reviews', [ReviewController::class, 'myReviews']);
-});
-
 /*
 |--------------------------------------------------------------------------
 | ADMIN

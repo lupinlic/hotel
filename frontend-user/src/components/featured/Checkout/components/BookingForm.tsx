@@ -41,6 +41,7 @@ function BookingForm() {
 
   const createBookingMutation = useCreateBooking();
   const createPaymentMutation = useCreatePayment();
+  const [isLoading, setIsLoading] = useState(false);
   const { room, checkIn, checkOut, adults, children, paymentMethod, clearBooking } =
     useBookingStore();
   const { data: user } = useGetUser();
@@ -93,6 +94,8 @@ function BookingForm() {
       special_requests: form.note,
     };
 
+    setIsLoading(true);
+
     try {
       if (form.paymentMethod === "hotel") {
         const booking = await createBookingMutation.mutateAsync(payload);
@@ -114,6 +117,8 @@ function BookingForm() {
       }
     } catch (err: any) {
       toast.error(err?.message || "Đặt phòng thất bại, vui lòng thử lại");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -289,9 +294,14 @@ function BookingForm() {
       {/* Button */}
       <button
         onClick={handleSubmit}
-        className="w-[180px] py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md font-medium cursor-pointer"
+        disabled={isLoading}
+        className={`w-[180px] py-2 rounded-md font-medium text-white ${
+          isLoading
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
+        }`}
       >
-        ĐẶT PHÒNG
+        {isLoading ? 'Đang xử lý...' : 'ĐẶT PHÒNG'}
       </button>
 
       {/* Login prompt modal for guest */}

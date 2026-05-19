@@ -16,7 +16,10 @@ class BookingController extends BaseController
     {
         $this->checkAdmin();
 
-        return Booking::with('user', 'rooms')->get();
+        return Booking::with('user', 'rooms')
+            ->orderByRaw("FIELD(status, 'pending', 'confirmed', 'checked_in', 'checked_out', 'completed', 'cancelled', 'no_show')")
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
     public function show($id)
@@ -96,7 +99,11 @@ class BookingController extends BaseController
 
     public function myBookings()
     {
-        return auth()->user()->bookings()->with(['rooms.roomType', 'payment'])->get();
+        return auth()->user()->bookings()
+            ->with(['rooms.roomType', 'payment'])
+            ->orderByRaw("FIELD(status, 'pending', 'confirmed', 'checked_in', 'checked_out', 'completed', 'cancelled', 'no_show')")
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
     public function cancel($id)

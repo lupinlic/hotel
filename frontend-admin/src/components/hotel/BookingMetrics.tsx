@@ -1,7 +1,13 @@
 "use client";
 import React from "react";
 import Badge from "../ui/badge/Badge";
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "@/icons";
+import {
+  ArrowUpIcon,
+  BoxIconLine,
+  DollarLineIcon,
+  GroupIcon,
+  PaperPlaneIcon,
+} from "@/icons";
 
 type BookingMetricsProps = {
   metrics: {
@@ -23,18 +29,21 @@ export const BookingMetrics = ({ metrics }: BookingMetricsProps) => {
     metrics.rooms.total > 0
       ? (metrics.rooms.available / metrics.rooms.total) * 100
       : 0;
+  const bookingConfirmedPercent =
+    metrics.bookings.total > 0
+      ? (metrics.bookings.confirmed / metrics.bookings.total) * 100
+      : 0;
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3 md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-          <GroupIcon className="text-gray-800 size-6 dark:text-white/90" />
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/3">
+        <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg dark:bg-gray-800">
+          <GroupIcon className="text-gray-800 size-5 dark:text-white/90" />
         </div>
-
-        <div className="flex items-end justify-between mt-5">
+        <div className="flex items-end justify-between mt-3">
           <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Khách đặt phòng</span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+            <span className="text-xs text-gray-500 dark:text-gray-400">Khách đặt phòng</span>
+            <h4 className="mt-1 font-bold text-gray-800 text-sm dark:text-white/90">
               {metrics.customers.total.toLocaleString()}
             </h4>
           </div>
@@ -45,21 +54,52 @@ export const BookingMetrics = ({ metrics }: BookingMetricsProps) => {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3 md:p-6">
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/3">
+        <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg dark:bg-gray-800">
           <BoxIconLine className="text-gray-800 dark:text-white/90" />
         </div>
-        <div className="flex items-end justify-between mt-5">
+        <div className="flex items-end justify-between mt-3">
           <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Phòng trống</span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+            <span className="text-xs text-gray-500 dark:text-gray-400">Phòng trống</span>
+            <h4 className="mt-1 font-bold text-gray-800 text-sm dark:text-white/90">
               {metrics.rooms.available.toLocaleString()}
             </h4>
           </div>
-
           <Badge color={roomAvailablePercent > 50 ? "success" : "warning"}>
             {roomAvailablePercent.toFixed(1)}%
           </Badge>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/3">
+        <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg dark:bg-gray-800">
+          <PaperPlaneIcon className="text-gray-800 dark:text-white/90" />
+        </div>
+        <div className="flex items-end justify-between mt-3">
+          <div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Đơn đặt phòng</span>
+            <h4 className="mt-1 font-bold text-gray-800 text-sm dark:text-white/90">
+              {metrics.bookings.total.toLocaleString()}
+            </h4>
+          </div>
+          <Badge color={bookingConfirmedPercent > 50 ? "success" : "warning"}>
+            {bookingConfirmedPercent.toFixed(1)}%
+          </Badge>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/3">
+        <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg dark:bg-gray-800">
+          <DollarLineIcon className="text-gray-800 dark:text-white/90" />
+        </div>
+        <div className="flex items-end justify-between mt-3">
+          <div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Doanh thu</span>
+            <h4 className="mt-1 font-bold text-gray-800 text-sm dark:text-white/90">
+              {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(metrics.revenue)}
+            </h4>
+          </div>
+          <Badge color="success">+{bookingConfirmedPercent.toFixed(1)}%</Badge>
         </div>
       </div>
     </div>

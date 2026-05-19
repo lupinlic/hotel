@@ -82,11 +82,22 @@ export default function RevenueChart({
       },
     },
     markers: {
-      size: 0, // Size of the marker points
+      size: 5, // Size of the marker points
       strokeColors: "#fff", // Marker border color
       strokeWidth: 2,
       hover: {
-        size: 6, // Marker size on hover
+        size: 8, // Marker size on hover
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: (val: number) =>
+        new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(val),
+      style: {
+        colors: ["#1f2937"],
       },
     },
     grid: {
@@ -100,9 +111,6 @@ export default function RevenueChart({
           show: true, // Show grid lines on y-axis
         },
       },
-    },
-    dataLabels: {
-      enabled: false, // Disable data labels
     },
     tooltip: {
       enabled: true, // Enable tooltip

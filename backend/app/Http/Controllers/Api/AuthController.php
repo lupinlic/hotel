@@ -23,26 +23,16 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        $otp = rand(100000, 999999);
-
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => trim($request->email),
             'password' => Hash::make($request->password),
             'role' => 'customer',
-            'otp' => $otp,
-            'otp_expires_at' => Carbon::now()->addMinutes(5),
-            'is_verified' => false,
+            'is_verified' => true,
         ]);
 
-        // gửi mail OTP
-        Mail::raw("Mã OTP của bạn là: $otp", function ($message) use ($user) {
-            $message->to($user->email)
-                    ->subject('Xác nhận tài khoản');
-        });
-
         return response()->json([
-            'message' => 'Đăng ký thành công, vui lòng nhập OTP gửi về email'
+            'message' => 'Đăng ký thành công, bạn có thể đăng nhập'
         ]);
     }
 

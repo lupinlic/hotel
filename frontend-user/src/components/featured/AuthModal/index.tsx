@@ -4,14 +4,11 @@ import { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLogin, useRegister } from "@/hooks/useAuth";
-import OtpModal from "./OtpModal";
 import ForgotPasswordModal from   "./ForgotPasswordModal";
 
 export default function AuthModal({ onClose }: { onClose: () => void }) {
   const [isRegister, setIsRegister] = useState(false);
-  const [showOtp, setShowOtp] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [otpEmail, setOtpEmail] = useState("");
 
   // ✅ tách state
   const [loginForm, setLoginForm] = useState({
@@ -82,11 +79,8 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
 
     registerMutation.mutate(registerForm, {
       onSuccess: () => {
-        toast.success("OTP đã gửi về email 📩");
-
-        setOtpEmail(registerForm.email);
-        setShowOtp(true); //
-
+        toast.success("Đăng ký thành công. Bạn có thể đăng nhập 🎉");
+        setIsRegister(false);
         setRegisterForm({ name: "", email: "", password: "" });
       },
       onError: (error: any) => {
@@ -328,17 +322,6 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       </div>
-      {showOtp && (
-        <OtpModal
-          email={otpEmail}
-          onClose={() => setShowOtp(false)}
-          onSuccess={() => {
-            setShowOtp(false);
-            setIsRegister(false);
-            toast.success("Bạn có thể đăng nhập 🎉");
-          }}
-        />
-      )}
       {showForgotPassword && (
         <ForgotPasswordModal
           onClose={() => setShowForgotPassword(false)}

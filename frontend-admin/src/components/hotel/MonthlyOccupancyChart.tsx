@@ -118,10 +118,10 @@ export default function MonthlyOccupancyChart({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Tỷ lệ lấp đầy hàng tháng
+            Tỷ lệ lấp đầy phòng
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Tỷ lệ hiện tại: {occupancyRate.toFixed(2)}%
+            Tỷ lệ lấp đầy hiện tại: {occupancyRate.toFixed(2)}%
           </p>
         </div>
 

@@ -64,6 +64,14 @@ const defaultData: RecentBooking[] = [
 ];
 
 export default function RecentBookings({ bookings = defaultData }: RecentBookingsProps) {
+  // Sort bookings: pending first, then confirmed, then canceled
+  const sortedBookings = [...bookings].sort((a, b) => {
+    const statusOrder = { "Pending": 0, "Confirmed": 1, "Canceled": 2 };
+    const orderA = statusOrder[a.status] ?? 3;
+    const orderB = statusOrder[b.status] ?? 3;
+    return orderA - orderB;
+  });
+
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/3 sm:px-6">
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -105,7 +113,7 @@ export default function RecentBookings({ bookings = defaultData }: RecentBooking
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {bookings.map((booking) => (
+              {sortedBookings.map((booking) => (
                 <TableRow key={booking.id}>
                   <TableCell className="py-3 text-gray-800 text-theme-sm dark:text-white/90">{booking.guestName}</TableCell>
                   <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">{booking.room}</TableCell>
