@@ -25,9 +25,18 @@ interface LoginResponse {
   token: string;
 }
 
-interface RegisterResponse {
+interface RegisterErrorResponse {
+  success: false;
+  message: string;
+}
+
+interface RegisterSuccessResponse {
+  success: true;
+  message: string;
   user: User;
 }
+
+type RegisterResponse = RegisterSuccessResponse | RegisterErrorResponse;
 
 export const useLogin = () => {
   return useMutation<LoginResponse, Error, LoginInput>({

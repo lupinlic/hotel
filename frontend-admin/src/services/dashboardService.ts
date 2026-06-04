@@ -79,11 +79,25 @@ export type RecentBookingDto = {
   rooms?: Array<{ id: number; room_number: string; status: string; room_type_id: number }>;
 };
 
+export type TopRoomDto = {
+  id: number;
+  room_number: string;
+  room_type: string;
+  booking_count: number;
+  total_revenue: number;
+};
+
+export type TopRoomsDto = {
+  period_start: string;
+  period_end: string;
+  data: TopRoomDto[];
+};
+
 export const getDashboardMetrics = async (): Promise<BookingMetricsDto> => {
   return fetchApi<BookingMetricsDto>("/admin/dashboard/metrics");
 };
 
-export const getDashboardRevenue = async (params?: { start?: string; end?: string; period?: "day" | "month" | "year"; }): Promise<{ period: string; start: string; end: string; data: RevenueItemDto[] }> => {
+export const getDashboardRevenue = async (params?: { start?: string; end?: string; period?: "day" | "week" | "month" | "quarter" | "year"; }): Promise<{ period: string; start: string; end: string; data: RevenueItemDto[] }> => {
   const query = new URLSearchParams();
   if (params?.start) query.append("start", params.start);
   if (params?.end) query.append("end", params.end);
@@ -104,4 +118,12 @@ export const getGuestDemographics = async (): Promise<GuestDemographicsDto> => {
 
 export const getRecentBookings = async (): Promise<RecentBookingDto[]> => {
   return fetchApi<RecentBookingDto[]>("/admin/dashboard/recent-bookings");
+};
+
+export const getTopRoomsBooked = async (params?: { start?: string; end?: string; limit?: number; }): Promise<TopRoomsDto> => {
+  const query = new URLSearchParams();
+  if (params?.start) query.append("start", params.start);
+  if (params?.end) query.append("end", params.end);
+  if (params?.limit) query.append("limit", params.limit.toString());
+  return fetchApi(`/admin/dashboard/top-rooms-booked?${query.toString()}`);
 };

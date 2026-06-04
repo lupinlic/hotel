@@ -5,6 +5,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { BookingMetrics } from "@/components/hotel/BookingMetrics";
 import MonthlyOccupancyChart from "@/components/hotel/MonthlyOccupancyChart";
 import RevenueChart from "@/components/hotel/RevenueChart";
+import TopRoomsChart, { TopRoomData } from "@/components/hotel/TopRoomsChart";
 import RecentBookings from "@/components/hotel/RecentBookings";
 import GuestDemographics from "@/components/hotel/GuestDemographics";
 import {
@@ -13,12 +14,14 @@ import {
   getDashboardRevenue,
   getGuestDemographics,
   getRecentBookings,
+  getTopRoomsBooked,
 } from "@/services/dashboardService";
 
 type DashboardData = {
   metrics: any;
   occupancy: any;
   revenueReport: any;
+  topRooms: TopRoomData[];
   guestStats: any;
   recentBookings: any;
 };
@@ -32,11 +35,12 @@ export function DashboardClient() {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
-        const [metrics, occupancy, revenueReport, guestStats, recentBookings] =
+        const [metrics, occupancy, revenueReport, topRooms, guestStats, recentBookings] =
           await Promise.all([
             getDashboardMetrics(),
             getDashboardOccupancy(),
-            getDashboardRevenue({ period: "month" }),
+            getDashboardRevenue({ period: "day" }),
+            getTopRoomsBooked(),
             getGuestDemographics(),
             getRecentBookings(),
           ]);
@@ -45,6 +49,7 @@ export function DashboardClient() {
           metrics,
           occupancy,
           revenueReport,
+          topRooms: topRooms.data || [],
           guestStats,
           recentBookings,
         });
@@ -92,11 +97,15 @@ export function DashboardClient() {
         />
       </div>
       <div className="md:col-span-5">
-        <GuestDemographics customersByDomain={data.guestStats.customers_by_domain} />
+        <TopRoomsChart topRooms={data.topRooms} />
       </div>
 
       <div className="md:col-span-12 space-y-6">
         <RevenueChart revenueData={data.revenueReport.data} />
+      </div>
+
+      <div className="md:col-span-12">
+        <GuestDemographics customersByDomain={data.guestStats.customers_by_domain} />
       </div>
 
       <div className="md:col-span-12">

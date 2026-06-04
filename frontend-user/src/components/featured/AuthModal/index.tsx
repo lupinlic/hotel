@@ -66,7 +66,7 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
           }, 800);
         },
         onError: (error: any) => {
-          toast.error(error.response?.data?.message || "Đăng nhập thất bại");
+          toast.error(error.message || error.response?.data?.message || "Đăng nhập thất bại");
         },
       },
     );
@@ -78,13 +78,18 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
     if (err) return toast.error(err);
 
     registerMutation.mutate(registerForm, {
-      onSuccess: () => {
+      onSuccess: (data: any) => {
+        if (data?.success === false) {
+          toast.error(data.message || "email đã tồn tại . Vui lòng dùng email khác");
+          return;
+        }
+
         toast.success("Đăng ký thành công. Bạn có thể đăng nhập 🎉");
         setIsRegister(false);
         setRegisterForm({ name: "", email: "", password: "" });
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Đăng ký thất bại");
+        toast.error(error.message || error.response?.data?.message || "Đăng ký thất bại");
       },
     });
   };

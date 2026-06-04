@@ -19,20 +19,28 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email:rfc,dns|unique:users',
+            'email' => 'required|email:rfc,dns',
             'password' => 'required|min:6',
         ]);
 
+        $email = trim($request->email);
+        if (User::where('email', $email)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email đã tồn tại . Vui lòng dùng Email khác',
+            ]);
+        }
+
         User::create([
             'name' => $request->name,
-            'email' => trim($request->email),
+            'email' => $email,
             'password' => Hash::make($request->password),
             'role' => 'customer',
             'is_verified' => true,
         ]);
 
         return response()->json([
-            'message' => 'Đăng ký thành công, bạn có thể đăng nhập'
+            'message' => 'Đăng ký thành công, bạn có thể đăng nhập',
         ]);
     }
 

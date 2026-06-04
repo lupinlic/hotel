@@ -36,7 +36,7 @@ class DashboardController extends BaseController
 
         $totalRevenue = Payment::where('status', 'paid')
             ->whereHas('booking', function ($q) {
-                $q->where('status', '!=', 'cancelled');
+                $q->where('status', 'completed');
             })
             ->sum('amount');
 
@@ -99,7 +99,7 @@ class DashboardController extends BaseController
         $roomCount = Room::count();
         $totalNights = $roomCount * ($start->diffInDays($end) + 1);
 
-        $occupiedNights = Booking::where('status', 'confirmed')
+        $occupiedNights = Booking::whereIn('status', ['confirmed', 'completed'])
             ->where('check_in', '<=', $end)
             ->where('check_out', '>=', $start)
             ->get()
@@ -114,7 +114,12 @@ class DashboardController extends BaseController
                 return $carry + $checkOut->diffInDays($checkIn);
             }, 0);
 
+        // sanitize values to prevent negative or nonsensical rates
+        $occupiedNights = max(0, (int) $occupiedNights);
+        $totalNights = max(1, (int) $totalNights);
+
         $rate = $totalNights ? round(($occupiedNights / $totalNights) * 100, 2) : 0;
+        $rate = max(0, min(100, $rate));
 
         return [
             'start' => $start->toDateString(),
@@ -130,21 +135,57 @@ class DashboardController extends BaseController
     {
         $this->checkAdmin();
 
-        $start = Carbon::parse($request->input('start', now()->subMonth()->startOfMonth()));
-        $end = Carbon::parse($request->input('end', now()->endOfDay()));
         $period = $request->input('period', 'month');
+        
+        // Determine date range based on period
+        if ($request->has('start') && $request->has('end')) {
+            $start = Carbon::parse($request->input('start'));
+            $end = Carbon::parse($request->input('end'));
+        } else {
+            switch ($period) {
+                case 'day':
+                    $start = now()->subDays(30)->startOfDay();
+                    $end = now()->endOfDay();
+                    break;
+                case 'week':
+                    $start = now()->subWeeks(12)->startOfWeek();
+                    $end = now()->endOfWeek();
+                    break;
+                case 'quarter':
+                    $start = now()->subQuarters(1)->startOfQuarter();
+                    $end = now()->endOfQuarter();
+                    break;
+                case 'year':
+                    $start = now()->subYears(1)->startOfYear();
+                    $end = now()->endOfYear();
+                    break;
+                case 'month':
+                default:
+                    $start = now()->subMonth()->startOfMonth();
+                    $end = now()->endOfDay();
+                    break;
+            }
+        }
 
         $groupSelect = $period === 'day'
             ? 'DATE(bookings.check_in) as label'
-            : ($period === 'year'
-                ? 'YEAR(bookings.check_in) as label'
-                : "DATE_FORMAT(bookings.check_in, '%Y-%m') as label");
+            : ($period === 'week'
+                ? "DATE_FORMAT(bookings.check_in, '%Y-W%u') as label"
+                : ($period === 'quarter'
+                    ? "CONCAT(YEAR(bookings.check_in), '-Q', QUARTER(bookings.check_in)) as label"
+                    : ($period === 'year'
+                        ? 'YEAR(bookings.check_in) as label'
+                        : "DATE_FORMAT(bookings.check_in, '%Y-%m') as label")));
 
         $groupBy = $period === 'day'
             ? 'DATE(bookings.check_in)'
-            : ($period === 'year'
-                ? 'YEAR(bookings.check_in)'
-                : "DATE_FORMAT(bookings.check_in, '%Y-%m')");
+            : ($period === 'week'
+                ? "DATE_FORMAT(bookings.check_in, '%Y-W%u')"
+                : ($period === 'quarter'
+                    ? "CONCAT(YEAR(bookings.check_in), '-Q', QUARTER(bookings.check_in))"
+                    : ($period === 'year'
+                        ? 'YEAR(bookings.check_in)'
+                        : "DATE_FORMAT(bookings.check_in, '%Y-%m')")));
 
         $query = Payment::select(
             DB::raw('SUM(payments.amount) as total_revenue'),
@@ -152,7 +193,7 @@ class DashboardController extends BaseController
         )
         ->join('bookings', 'payments.booking_id', '=', 'bookings.id')
         ->where('payments.status', 'paid')
-        ->where('bookings.status', '!=', 'cancelled')
+        ->where('bookings.status', 'completed')
         ->whereBetween('bookings.check_in', [$start->toDateString(), $end->toDateString()])
         ->groupBy(DB::raw($groupBy))
         ->orderBy('label')
@@ -163,6 +204,45 @@ class DashboardController extends BaseController
             'start' => $start->toDateString(),
             'end' => $end->toDateString(),
             'data' => $query,
+        ];
+    }
+
+    public function topRoomsBooked(Request $request)
+    {
+        $this->checkAdmin();
+
+        $limit = $request->input('limit', 5);
+        $start = $request->has('start') ? Carbon::parse($request->input('start')) : now()->subMonth()->startOfMonth();
+        $end = $request->has('end') ? Carbon::parse($request->input('end')) : now()->endOfDay();
+
+        $topRooms = Room::select(
+            'rooms.id',
+            'rooms.room_number',
+            'room_types.name as room_type',
+            DB::raw('COUNT(booking_rooms.id) as booking_count'),
+            DB::raw('SUM(payments.amount) as total_revenue')
+        )
+        ->leftJoin('booking_rooms', 'rooms.id', '=', 'booking_rooms.room_id')
+        ->leftJoin('bookings', 'booking_rooms.booking_id', '=', 'bookings.id')
+        ->leftJoin('payments', 'bookings.id', '=', 'payments.booking_id')
+        ->leftJoin('room_types', 'rooms.room_type_id', '=', 'room_types.id')
+        ->where('bookings.status', 'completed')
+        ->whereBetween('bookings.check_in', [$start->toDateString(), $end->toDateString()])
+        ->groupBy('rooms.id', 'rooms.room_number', 'room_types.name')
+        ->orderBy('booking_count', 'desc')
+        ->limit($limit)
+        ->get();
+
+        return [
+            'period_start' => $start->toDateString(),
+            'period_end' => $end->toDateString(),
+            'data' => $topRooms->map(fn ($room) => [
+                'id' => $room->id,
+                'room_number' => $room->room_number,
+                'room_type' => $room->room_type,
+                'booking_count' => (int) $room->booking_count,
+                'total_revenue' => (float) ($room->total_revenue ?? 0),
+            ]),
         ];
     }
 }

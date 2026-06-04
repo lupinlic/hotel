@@ -146,4 +146,5 @@ Route::middleware(['auth:api'])->prefix('admin')->group(function () {
     Route::get('/dashboard/occupancy', [DashboardController::class, 'dashboardOccupancy']);
     Route::get('/dashboard/guest-demographics', [DashboardController::class, 'guestDemographics']);
     Route::get('/dashboard/recent-bookings', [DashboardController::class, 'recentBookings']);
+    Route::get('/dashboard/top-rooms-booked', [DashboardController::class, 'topRoomsBooked']);
 });
