@@ -20,8 +20,13 @@ export default function ReviewSection({ roomId }: ReviewSectionProps) {
   const [comment, setComment] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-  // Filter reviews for this room type
-  const roomReviews = reviews?.filter(review => review.room_id === roomId) || [];
+  // Filter reviews for this room type. Reviews store actual room id; fall back to room.room_type_id when available.
+  const roomReviews = reviews?.filter(review => (
+    // If backend returns nested room with room_type_id, match against that (room type page)
+    (review.room && (review.room as any).room_type_id === roomId) ||
+    // Otherwise match by room_id
+    review.room_id === roomId
+  )) || [];
 
   // Check if user has completed stay (or checked out) for this room
   const hasEligibleBooking = myBookings?.some(booking =>

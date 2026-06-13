@@ -52,10 +52,14 @@ class ReviewController extends BaseController
         }
 
         $room = $booking->rooms()->first();
-        $roomTypeId = $room?->room_type_id;
+        $roomId = $room?->id;
+
+        if (!$roomId) {
+            abort(400, 'Không tìm thấy phòng để đánh giá');
+        }
 
         $review = Review::create([
-            'room_id' => $roomTypeId,
+            'room_id' => $roomId,
             'booking_id' => $booking->id,
             'user_id' => $user->id,
             'rating' => $request->rating,

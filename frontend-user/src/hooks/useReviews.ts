@@ -13,7 +13,9 @@ interface Review {
     name: string;
   };
   room: {
-    name: string;
+    id?: number;
+    name?: string;
+    room_type_id?: number;
   };
   booking: {
     id: number;
