@@ -178,7 +178,14 @@ class BookingController extends BaseController
 
         $booking->update(['status' => 'completed']);
 
-        return $booking;
+        if ($payment = $booking->payment) {
+            $payment->update([
+                'status' => 'completed',
+                'paid_at' => now(),
+            ]);
+        }
+
+        return $booking->load('payment');
     }
 
     public function noShow($id)

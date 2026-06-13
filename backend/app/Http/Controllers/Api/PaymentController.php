@@ -35,7 +35,7 @@ class PaymentController extends BaseController
         // Nếu khách thanh toán chuyển khoản thì tính là đã thanh toán.
         // Nếu thanh toán tại quầy thì vẫn giữ pending.
         if ($method === 'bank_transfer') {
-            $status = 'paid';
+            $status = 'completed';
         } elseif ($method === 'cash') {
             $status = 'pending';
         }

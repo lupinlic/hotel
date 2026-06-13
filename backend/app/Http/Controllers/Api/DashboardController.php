@@ -34,8 +34,7 @@ class DashboardController extends BaseController
         $pendingBookings = Booking::where('status', 'pending')->count();
         $confirmedBookings = Booking::where('status', 'confirmed')->count();
 
-        $totalRevenue = Payment::where('status', 'paid')
-            ->whereHas('booking', function ($q) {
+        $totalRevenue = Payment::whereHas('booking', function ($q) {
                 $q->where('status', 'completed');
             })
             ->sum('amount');
@@ -192,9 +191,10 @@ class DashboardController extends BaseController
             DB::raw($groupSelect)
         )
         ->join('bookings', 'payments.booking_id', '=', 'bookings.id')
-        ->where('payments.status', 'paid')
-        ->where('bookings.status', 'completed')
-        ->whereBetween('bookings.check_in', [$start->toDateString(), $end->toDateString()])
+        ->whereHas('booking', function ($q) use ($start, $end) {
+            $q->where('status', 'completed')
+              ->whereBetween('check_in', [$start->toDateString(), $end->toDateString()]);
+        })
         ->groupBy(DB::raw($groupBy))
         ->orderBy('label')
         ->get();
